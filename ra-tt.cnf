@@ -1,0 +1,9 @@
+InpDirName:D:\Temp
+TempDirName:D:\TEMP
+SelectDirName:D:\Temp
+UnselDirName:D:\Temp
+SelectFile:D:\My Proects\!!! Архив\Mongoose2.PCAP\select.slc
+Select:3
+MinLen:2000
+MaxLen:4060
+Flag_SaveNonSel:0
