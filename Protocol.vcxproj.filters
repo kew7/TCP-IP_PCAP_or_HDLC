@@ -13,9 +13,6 @@
       <UniqueIdentifier>{a0359443-7588-44c8-b42d-ea0211f8d856}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
-    <Filter Include="SIGNAL">
-      <UniqueIdentifier>{58d3eb58-8b31-411a-84e8-7fb49c952d78}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataProtocol.cpp">
@@ -112,17 +109,5 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ReadMe.txt" />
-    <None Include="Signal\1.pcap">
-      <Filter>SIGNAL</Filter>
-    </None>
-    <None Include="Signal\20110615.pcap">
-      <Filter>SIGNAL</Filter>
-    </None>
-    <None Include="Signal\HDLC.cap">
-      <Filter>SIGNAL</Filter>
-    </None>
-    <None Include="Signal\HDLC.dat">
-      <Filter>SIGNAL</Filter>
-    </None>
   </ItemGroup>
 </Project>

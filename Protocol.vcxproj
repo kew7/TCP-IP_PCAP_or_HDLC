@@ -214,10 +214,6 @@
     <None Include="res\Protocol.ico" />
     <None Include="res\Protocol.rc2" />
     <None Include="ReadMe.txt" />
-    <None Include="Signal\1.pcap" />
-    <None Include="Signal\20110615.pcap" />
-    <None Include="Signal\HDLC.cap" />
-    <None Include="Signal\HDLC.dat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
