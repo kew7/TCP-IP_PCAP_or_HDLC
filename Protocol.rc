@@ -120,8 +120,8 @@ BEGIN
     LTEXT           "Удалять короче",IDC_STATIC,94,12,57,9
     LTEXT           "Удалять длиннее",IDC_STATIC,93,23,60,9
     GROUPBOX        "Сеансы",IDC_STATIC,74,0,224,49
-    LTEXT           "",IDC_STATIC_KD,233,10,54,9,SS_SUNKEN
-    LTEXT           "",IDC_STATIC_DD,233,23,54,9,SS_SUNKEN
+    LTEXT           "",IDC_STATIC_KD,233,10,58,9,SS_SUNKEN
+    LTEXT           "",IDC_STATIC_DD,233,22,58,9,SS_SUNKEN
     RTEXT           "Состояние:",IDC_STATIC,196,72,38,9
     CTEXT           "",IDC_SOST,241,71,58,9,SS_CENTERIMAGE | SS_SUNKEN
     CONTROL         "",IDC_CheckDelMin,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,11,9,10
@@ -138,8 +138,7 @@ BEGIN
     CONTROL         "Файл HDLC",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,13,55,10
     CONTROL         "Файл CAP",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,27,55,10
     LISTBOX         IDC_LIST1,1,104,186,11,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         " <IP-Addr+TCP-Port> в заголовк сеанса",IDC_CHECK1,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,154,34,143,8
+    CONTROL         " <IPaddr+TCPport> в заголовк сеанса",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_CENTER | WS_TABSTOP,154,34,137,8
 END
 
 IDD_DIrOpenDialog DIALOGEX 0, 0, 168, 154
