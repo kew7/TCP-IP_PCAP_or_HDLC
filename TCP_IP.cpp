@@ -115,7 +115,7 @@ UINT CTCP_IP::DePakets(BYTE *BufIN, UINT nCount)  // обработка протокола и выдел
 	return 0;
 }
 
-bool CTCP_IP::InitData(BYTE *BufIN,UINT nCount)
+bool CTCP_IP::InitData(BYTE *BufIN,UINT nCount)				// определение параметров пакета
  {
 	
  	nLengthIP=0;
@@ -128,7 +128,7 @@ bool CTCP_IP::InitData(BYTE *BufIN,UINT nCount)
  	nPort_po=0;
 	int i;
  	
- 	nLengthIP=(*(BufIN+nBegin)<<4);		// длина IP заголовка
+ 	nLengthIP=(*(BufIN+nBegin)<<4);							// длина IP заголовка
 	nLengthIP=(nLengthIP>>4)*4;
  	
  
@@ -154,9 +154,9 @@ bool CTCP_IP::InitData(BYTE *BufIN,UINT nCount)
 		nPort_po=nPort_po+*(BufIN+nBegin+nLengthIP+2+i);	//порт получател€
  	}
  	
- 	nLengthTCP=(*(BufIN+nBegin+nLengthIP+12)>>4)*4;	//длина TCP заголовка
+ 	nLengthTCP=(*(BufIN+nBegin+nLengthIP+12)>>4)*4;			//длина TCP заголовка
  
- 	nFlag=(*(BufIN+nBegin+nLengthIP+13));	//управл€ющие биты
+ 	nFlag=(*(BufIN+nBegin+nLengthIP+13));					//управл€ющие биты
 
 
 	if(*(BufIN+nBegin)!=0x45 || *(BufIN+nBegin+9)!=0x06
@@ -164,7 +164,7 @@ bool CTCP_IP::InitData(BYTE *BufIN,UINT nCount)
 	return TRUE;
  }
 
-bool CTCP_IP::Soed(BYTE *BufIN,UINT cdata)
+bool CTCP_IP::Soed(BYTE *BufIN,UINT cdata)					// регистраци€ соединений
 {
 	BYTE a=0;
 	BYTE*pBuf;
@@ -187,8 +187,6 @@ bool CTCP_IP::Soed(BYTE *BufIN,UINT cdata)
 			nData.SetAt(cdata,m_DP);
 
  			return TRUE;
-			
-
 	}
 	else
     if(nData.GetAt(cdata).dNomData<nNomData)
@@ -232,7 +230,7 @@ bool CTCP_IP::Soed(BYTE *BufIN,UINT cdata)
 return FALSE;
 }
 
-void CTCP_IP::FormatData(UINT ii)
+void CTCP_IP::FormatData(UINT ii)		// запись сеансов соответственно параметрам отбора
 {
 	if(!Granica(ii))
 	{
@@ -302,7 +300,7 @@ void CTCP_IP::Zagolovok()  // вставл€ет заголовок в начало регистрируемого сеанс
 	//s = strHDR;
 
 	CTime t = CTime::GetCurrentTime();
-	sT = t.Format("%d.%m.%y");          // текущие дата и врем€ в заголовок
+	sT = t.Format("%d.%m.%y");								// текущие дата и врем€ в заголовок
 	s.Delete(nIndexHDR[0], 8);
 	s.Insert(nIndexHDR[0], sT);
 
@@ -312,7 +310,7 @@ void CTCP_IP::Zagolovok()  // вставл€ет заголовок в начало регистрируемого сеанс
 
 	for (j = 3;j >= 0;j--)
 	{
-		zIP = (nData[nCountData].dIP_ot >> (8 * j)) & 0xFF;
+		zIP = (nData[nCountData].dIP_ot >> (8 * j)) & 0xFF;	// IP-адрес отправител€
 		strTemp = strZagFR;
 		strZagFR.Format("%u", zIP);
 		switch (strZagFR.GetLength())
@@ -324,7 +322,7 @@ void CTCP_IP::Zagolovok()  // вставл€ет заголовок в начало регистрируемого сеанс
 		if (j > 0) strZagFR += ".";
 	}
 
-	strTemp.Format("%u", nData[nCountData].dPort_ot);
+	strTemp.Format("%u", nData[nCountData].dPort_ot);		// TCP-порт отправител€
 	switch (strTemp.GetLength())
 	{
 	case 1: strTemp = "0000" + strTemp; break;
@@ -333,17 +331,16 @@ void CTCP_IP::Zagolovok()  // вставл€ет заголовок в начало регистрируемого сеанс
 	case 4: strTemp = "0" + strTemp;    break;
 	}
 
-
-	s.Delete(nIndexHDR[2], strZagFR.GetLength()); // IP-адрес и порт отправ. в заголовок
+	s.Delete(nIndexHDR[2], strZagFR.GetLength()); 
 	s.Insert(nIndexHDR[2], strZagFR);
 	s.Delete(nIndexHDR[3], strTemp.GetLength());
 	s.Insert(nIndexHDR[3], strTemp);
 
-	strZagFR = " FROM " + strZagFR + " " + strTemp;
+	strZagFR = " FROM " + strZagFR + " " + strTemp;			// IP-адрес и TCP-порт отправител€ в заголовок
 
 	for (j = 3;j >= 0;j--)
 	{
-		zIP = (nData[nCountData].dIP_po >> (8 * j)) & 0xFF;
+		zIP = (nData[nCountData].dIP_po >> (8 * j)) & 0xFF;	// IP-адрес получател€
 		strTemp = strZagTO;
 		strZagTO.Format("%u", zIP);
 		switch (strZagTO.GetLength())
@@ -355,7 +352,7 @@ void CTCP_IP::Zagolovok()  // вставл€ет заголовок в начало регистрируемого сеанс
 		if (j > 0) strZagTO += ".";
 	}
 
-	strTemp.Format("%u", nData[nCountData].dPort_po);
+	strTemp.Format("%u", nData[nCountData].dPort_po);		// TCP-порт получател€
 	switch (strTemp.GetLength())
 	{
 	case 1: strTemp = "0000" + strTemp; break;
@@ -363,15 +360,16 @@ void CTCP_IP::Zagolovok()  // вставл€ет заголовок в начало регистрируемого сеанс
 	case 3: strTemp = "00" + strTemp;   break;
 	case 4: strTemp = "0" + strTemp;    break;
 	}
-
-	s.Delete(nIndexHDR[4], strZagTO.GetLength()); // IP-адрес и порт получ. в заголовок
+	
+	s.Delete(nIndexHDR[4], strZagTO.GetLength());			
 	s.Insert(nIndexHDR[4], strZagTO);
 	s.Delete(nIndexHDR[5], strTemp.GetLength());
 	s.Insert(nIndexHDR[5], strTemp);
 
-	strZagTO = "  TO " + strZagTO + " " + strTemp;
+	strZagTO = "  TO " + strZagTO + " " + strTemp;			// IP-адрес и TCP-порт получател€ в заголовок
 
-	strZag = strZagFR + strZagTO + " \r\n";
+	// объедин€ем части заголовка дл€ получател€ и отправител€
+	strZag = strZagFR + strZagTO + " \r\n";					
 
 	if (WriteFile(nData.GetAt(nCountData).h_File, strZag, strZag.GetLength(), &bReturned, NULL) == NULL)
 		MessageBox(NULL, "«аголовок", 0, MB_ICONERROR);
@@ -418,8 +416,8 @@ void CTCP_IP::WriteSeans(UINT& gFile, UINT& gDir, CString& gstrDir,CString strDi
 	
 	CString sTemp,sNameFile,sDDD;
 
-	// –асширени€ регистрирумых сеансов - в зависимости от номера использумего порта
-	sDDD = ".rdy";			 // расширение по умолчанию
+	// –асширени€ регистрирумых файлов - в зависимости от номера использумего порта
+	sDDD = ".rdy";	// расширение по умолчанию
 	// провер€ем порты
 	if((nPort_po==80)||(nPort_ot==80)) sDDD=".htm";
 	if ((nPort_po == 8080) || (nPort_ot == 8080)) sDDD = ".htm";
@@ -472,7 +470,7 @@ void CTCP_IP::WriteSeans(UINT& gFile, UINT& gDir, CString& gstrDir,CString strDi
 	return;	 
 }
 
-bool CTCP_IP::InArray(UINT dData)
+bool CTCP_IP::InArray(UINT dData)		// поиск IP-адресов
 {
 	int min=0,max;
 
