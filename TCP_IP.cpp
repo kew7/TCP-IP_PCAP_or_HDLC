@@ -75,8 +75,6 @@ UINT CTCP_IP::DePakets(BYTE *BufIN, UINT nCount)  // обработка протокола и выдел
        if(i==-1)
 		 if((nFlag&0x02)==0x02)
 	   {
-
-				
 				m_DP.dIP_ot=nIP_ot;
 				m_DP.dIP_po=nIP_po;
 				m_DP.dPort_po=nPort_po;
@@ -92,6 +90,8 @@ UINT CTCP_IP::DePakets(BYTE *BufIN, UINT nCount)  // обработка протокола и выдел
 					   	MessageBox(NULL,"Создание",0,MB_ICONERROR);
 
 	nData.Add(m_DP);
+
+	if (theApp.dlg->m_InsHead) Zagolovok();			// если включена галочка "<IP-Addr+TCP-Port> в заголовк сеанса"
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -286,6 +286,95 @@ void CTCP_IP::FormatData(UINT ii)
 	nData.RemoveAt(ii,1);
 	nCountData--;
 
+	return;
+}
+
+void CTCP_IP::Zagolovok()  // вставляет заголовок в начало регистрируемого сеанса
+{
+	CString strZagFR = "", strZagTO = "",
+		strZag,
+		strTemp;
+	CString s, sT;
+	BYTE zIP;
+	DWORD bReturned;
+	int j;
+
+	//s = strHDR;
+
+	CTime t = CTime::GetCurrentTime();
+	sT = t.Format("%d.%m.%y");          // текущие дата и время в заголовок
+	s.Delete(nIndexHDR[0], 8);
+	s.Insert(nIndexHDR[0], sT);
+
+	sT = t.Format("%H:%M:%S");
+	s.Delete(nIndexHDR[1], 8);
+	s.Insert(nIndexHDR[1], sT);
+
+	for (j = 3;j >= 0;j--)
+	{
+		zIP = (nData[nCountData].dIP_ot >> (8 * j)) & 0xFF;
+		strTemp = strZagFR;
+		strZagFR.Format("%u", zIP);
+		switch (strZagFR.GetLength())
+		{
+		case 1: strZagFR = "00" + strZagFR; break;
+		case 2: strZagFR = "0" + strZagFR;  break;
+		}
+		strZagFR = strTemp + strZagFR;
+		if (j > 0) strZagFR += ".";
+	}
+
+	strTemp.Format("%u", nData[nCountData].dPort_ot);
+	switch (strTemp.GetLength())
+	{
+	case 1: strTemp = "0000" + strTemp; break;
+	case 2: strTemp = "000" + strTemp;  break;
+	case 3: strTemp = "00" + strTemp;   break;
+	case 4: strTemp = "0" + strTemp;    break;
+	}
+
+
+	s.Delete(nIndexHDR[2], strZagFR.GetLength()); // IP-адрес и порт отправ. в заголовок
+	s.Insert(nIndexHDR[2], strZagFR);
+	s.Delete(nIndexHDR[3], strTemp.GetLength());
+	s.Insert(nIndexHDR[3], strTemp);
+
+	strZagFR = " FROM " + strZagFR + " " + strTemp;
+
+	for (j = 3;j >= 0;j--)
+	{
+		zIP = (nData[nCountData].dIP_po >> (8 * j)) & 0xFF;
+		strTemp = strZagTO;
+		strZagTO.Format("%u", zIP);
+		switch (strZagTO.GetLength())
+		{
+		case 1: strZagTO = "00" + strZagTO; break;
+		case 2: strZagTO = "0" + strZagTO;  break;
+		}
+		strZagTO = strTemp + strZagTO;
+		if (j > 0) strZagTO += ".";
+	}
+
+	strTemp.Format("%u", nData[nCountData].dPort_po);
+	switch (strTemp.GetLength())
+	{
+	case 1: strTemp = "0000" + strTemp; break;
+	case 2: strTemp = "000" + strTemp;  break;
+	case 3: strTemp = "00" + strTemp;   break;
+	case 4: strTemp = "0" + strTemp;    break;
+	}
+
+	s.Delete(nIndexHDR[4], strZagTO.GetLength()); // IP-адрес и порт получ. в заголовок
+	s.Insert(nIndexHDR[4], strZagTO);
+	s.Delete(nIndexHDR[5], strTemp.GetLength());
+	s.Insert(nIndexHDR[5], strTemp);
+
+	strZagTO = "  TO " + strZagTO + " " + strTemp;
+
+	strZag = strZagFR + strZagTO + " \r\n";
+
+	if (WriteFile(nData.GetAt(nCountData).h_File, strZag, strZag.GetLength(), &bReturned, NULL) == NULL)
+		MessageBox(NULL, "Заголовок", 0, MB_ICONERROR);
 	return;
 }
 

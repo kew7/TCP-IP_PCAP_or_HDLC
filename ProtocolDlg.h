@@ -106,6 +106,7 @@ public:
 	afx_msg void OnRadio1();
 	afx_msg void OnRadio2();
 	CListBox m_ListBox;
+	BOOL m_InsHead;
 };
 
 typedef CProtocolDlg*mClass;

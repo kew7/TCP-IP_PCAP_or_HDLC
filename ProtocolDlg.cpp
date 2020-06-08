@@ -85,6 +85,7 @@ UINT ThreadFunc(void*CCC)
 CProtocolDlg::CProtocolDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CProtocolDlg::IDD, pParent)
 	, m_Radio(0)
+	, m_InsHead(FALSE)
 {
 	//{{AFX_DATA_INIT(CProtocolDlg)
 	m_KData = _T("0 Byte");
@@ -117,6 +118,7 @@ void CProtocolDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO1, m_Radio);
 	DDV_MinMaxInt(pDX, m_Radio, 0, 1);
 	DDX_Control(pDX, IDC_LIST1, m_ListBox);
+	DDX_Check(pDX, IDC_CHECK1, m_InsHead);
 }
 
 BEGIN_MESSAGE_MAP(CProtocolDlg, CDialog)
@@ -412,8 +414,7 @@ void CProtocolDlg::BufLoadCAP()	// обработка файла CAP
 		/*
 		* Step 2 - Get a file name
 		*/
-		std::string file = m_InFile;
-		; // the name of file
+		std::string file = m_InFile;  // the name of file
 
 		/*
 		* Step 3 - Create an char array to hold the error.
@@ -452,7 +453,7 @@ void CProtocolDlg::BufLoadCAP()	// обработка файла CAP
 		}
 		pcap_close(fpcap);
 
-		m_Progress.SetRange(0, NumberOfPackets/10);	// калибруем ползунок
+		m_Progress.SetRange(0, NumberOfPackets/10);			// калибруем ползунок
 
 		// снова открываем файл для чтения и обработки
 		fpcap = pcap_open_offline(file.c_str(), errbuff);
@@ -466,13 +467,13 @@ void CProtocolDlg::BufLoadCAP()	// обработка файла CAP
 			{
 				buf_save[i] = data[i];
 			}
-			m_Progress.SetPos(packetCount/10);		// отобрражем ползунок процесса обработки
-			m_TcpIp.DePakets(buf_save, header->caplen);
+			m_Progress.SetPos(packetCount/10);				// отобрражем ползунок процесса обработки
+			m_TcpIp.DePakets(buf_save, header->caplen);		// вызываем обработку пакета
 
 		}
 		pcap_close(fpcap);
 		StrTemp.Format("%u", NumberOfPackets);
-		m_ListBox.AddString("Processing is complete. Number of Packets:" + StrTemp);
+		m_ListBox.AddString("Processing is complete. Number of Packets: " + StrTemp);
 	return;
 }
 
@@ -821,10 +822,10 @@ void CProtocolDlg::OnFileSel()
 	
 }
 
-   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   //~~~~~~~~~~~~~~~~~ МЕТОД БЫСТРОЙ СОРТИРОВКИ (QuickSort) ~~~~~~~~~~~~~~~~~~~~~~~~~
    // Особенностью использования данной функции является применение рекурсии
 
-void CProtocolDlg::QuickSort(CArray<UINT,UINT>*A,int iLo,int iHi)
+void CProtocolDlg::QuickSort(CArray<UINT,UINT>*A,int iLo,int iHi) 
 {
     int Lo,
 		 Hi;
@@ -864,7 +865,7 @@ return;
 
 
 
-void CProtocolDlg::OnNonSelDir() 
+void CProtocolDlg::OnNonSelDir()			// выбор папки неотбора
 {
 	// TODO: Add your command handler code here
 	CDirOpenDialog m_DirDlg;
@@ -882,7 +883,7 @@ void CProtocolDlg::OnNonSelDir()
 	
 }
 
-void CProtocolDlg::OnSelDir() 
+void CProtocolDlg::OnSelDir()				// папка отбора
 {
 	// TODO: Add your command handler code here
 	CDirOpenDialog m_DirDlg;
@@ -912,7 +913,7 @@ void CProtocolDlg::OnClose()
  CDialog::OnCancel();
 }
 
-void CProtocolDlg::OnSaveCfg() 
+void CProtocolDlg::OnSaveCfg()		// сохранение конфигурациии
 {
 	// TODO: Add your command handler code here
 	CFileDialog dlgFile(FALSE,"cnf",NULL,OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
@@ -924,7 +925,7 @@ void CProtocolDlg::OnSaveCfg()
 return;	
 }
 
-void CProtocolDlg::OnZagrCfg() 
+void CProtocolDlg::OnZagrCfg()			//открываем файл конфигурции
 {
 	// TODO: Add your command handler code here
 	CFileDialog dlgFile(TRUE,NULL,NULL,OFN_HIDEREADONLY,
@@ -938,7 +939,7 @@ void CProtocolDlg::OnZagrCfg()
 	}
 }
 
-void CProtocolDlg::ZagrCfg(CString FileName)
+void CProtocolDlg::ZagrCfg(CString FileName)	// загружаем конфигурацию
 {
 
 	CStdioFile f;
@@ -1066,8 +1067,7 @@ void CProtocolDlg::ZagrCfg(CString FileName)
 }
 
 
-
-void CProtocolDlg::SaveCfg(CString FileName)
+void CProtocolDlg::SaveCfg(CString FileName)		// сохраняем конфигурацию в файл
 {
 
  CFile f;
