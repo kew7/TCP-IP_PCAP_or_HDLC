@@ -644,163 +644,163 @@ void CProtocolDlg::OnTimer(UINT nIDEvent)
        
 BOOL CProtocolDlg::ZagrOtbor()
 {
-  CStdioFile m_FOtbor;
-  CString Str;
-  UINT FindFlag=0,i,NewElem=0;
+	  CStdioFile m_FOtbor;
+	  CString Str;
+	  UINT FindFlag=0,i,NewElem=0;
  
-  // Обнуляем массивы перед загрузкой
+	  // Обнуляем массивы перед загрузкой
 
-  m_TcpIp.pBufPORT->RemoveAll();
-  m_TcpIp.pBufIP_2->RemoveAll();
-  m_TcpIp.pBufIP_3->RemoveAll();
-  m_TcpIp.pBufIP_4->RemoveAll();
+	  m_TcpIp.pBufPORT->RemoveAll();
+	  m_TcpIp.pBufIP_2->RemoveAll();
+	  m_TcpIp.pBufIP_3->RemoveAll();
+	  m_TcpIp.pBufIP_4->RemoveAll();
 
-  if(m_FileSel!="")
-  {
-	  if(!m_FOtbor.Open(m_FileSel,CFile::modeReadWrite))
+	  if(m_FileSel!="")
 	  {
-	    MessageBox("Hе могу найти файл отбора - "+m_FileSel,NULL,MB_ICONERROR);
-	    m_FileSel.Empty();
-	    return FALSE;
+		  if(!m_FOtbor.Open(m_FileSel,CFile::modeReadWrite))
+		  {
+			MessageBox("Hе могу найти файл отбора - "+m_FileSel,NULL,MB_ICONERROR);
+			m_FileSel.Empty();
+			return FALSE;
+		  }
 	  }
-  }
-  else return FALSE;
+	  else return FALSE;
   
-  while(m_FOtbor.ReadString(Str))
-  {
-	  if((FindFlag=Str.Find("порт"))!=-1) break;  //находим строку "//порт"
-  }
-
-  if(FindFlag==-1) 
-  {
-	  delete m_TcpIp.pBufPORT;
-	  MessageBox("Hеправильный формат файла отбора - "+m_FileSel,NULL,MB_ICONERROR);
-	  return FALSE;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////
-  // ~~~~~~~~~~~~~~~~~~~~~Загружаем TCP-порты в  массив~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  m_TcpIp.pBufPORT->SetSize(65536);
-  for(i=0;i<65536;i++)           // обнуляем массив 
-  {
-	  m_TcpIp.pBufPORT->SetAt(i,0);
-  }
-
-  while(m_FOtbor.ReadString(Str)) // считываем строки из файла
-  {
-    Str.TrimLeft();    
-	Str.TrimRight();              // удаляем пробелы в начале и конце строки
-  
-    NewElem=(UINT)atoi(Str);
-    m_TcpIp.pBufPORT->SetAt(NewElem,(unsigned short) NewElem);      
-	if(Str=="//адрес") break;
-  }
-
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Конец загрузки~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  //////////////////////////////////////////////////////////////////////////////////////////
-
-  
-  m_FOtbor.SeekToBegin();         // на  начало файла
-
-  while(m_FOtbor.ReadString(Str))
-  {
-	  if((FindFlag=Str.Find("адрес"))!=-1) break;  //находим строку "//адрес"
-  }
-
-  if(FindFlag==-1) 
-  {
-	  delete m_TcpIp.pBufIP_2;
-	  delete m_TcpIp.pBufIP_3;
-	  delete m_TcpIp.pBufIP_4;
-	  MessageBox("Hеправильный формат файла отбора - "+m_FileSel,NULL,MB_ICONERROR);
-	  return FALSE;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////
-  // ~~~~~~~~~~~~~~~~~~~~~Загружаем IP-адреса в соответствующие массивы~~~~~~~~~~~~~~~~~
-
-  m_TcpIp.pBufIP_2->SetSize(65536);
-  for(i=0;i<65536;i++)           // обнуляем массив для 2-х байтных адресов
-  {
-	  m_TcpIp.pBufIP_2->SetAt(i,0);
-  }
-
-  while(m_FOtbor.ReadString(Str)) // считываем строки из файла
-  {
-    Str.TrimLeft();    
-	Str.TrimRight();              // удаляем пробелы в начале и конце строки
-
-	// если длина строки соответствует 2-х байтному адресу
-	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    if(Str.GetLength()==7) 
-	{
-      NewElem=0;
-      if(Str.Find('.')!=3) return FALSE;
-	  for(i=0;i<2;i++)
+	  while(m_FOtbor.ReadString(Str))
 	  {
-		  NewElem=(NewElem<<8)|((UINT)atoi(Str.Mid(4*i,3)));
+		  if((FindFlag=Str.Find("порт"))!=-1) break;  //находим строку "//порт"
 	  }
-      m_TcpIp.pBufIP_2->SetAt(NewElem,(unsigned short) NewElem);      
-	}
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	// если длина строки соответствует 3-х байтному адресу
-	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    else
-	 if(Str.GetLength()==11) 
-	 {
-      NewElem=0; 
-      if(Str.Find('.')!=3) return FALSE;
-	  for(i=0;i<3;i++)
+	  if(FindFlag==-1) 
 	  {
-		  NewElem=(NewElem<<8)|((UINT)atoi(Str.Mid(4*i,3)));
+		  delete m_TcpIp.pBufPORT;
+		  MessageBox("Hеправильный формат файла отбора - "+m_FileSel,NULL,MB_ICONERROR);
+		  return FALSE;
 	  }
-      m_TcpIp.pBufIP_3->Add(NewElem);      
-	 }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-     // если длина строки соответствует 4-х байтному адресу
-     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 else
-	  if(Str.GetLength()==15) 
+	  //////////////////////////////////////////////////////////////////////////////////////
+	  // ~~~~~~~~~~~~~~~~~~~~~Загружаем TCP-порты в  массив~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	  m_TcpIp.pBufPORT->SetSize(65536);
+	  for(i=0;i<65536;i++)           // обнуляем массив 
 	  {
-       NewElem=0; 
-       if(Str.Find('.')!=3) return FALSE;
-	   for(i=0;i<4;i++)
-	   {
-		  NewElem=(NewElem<<8)|((UINT)atoi(Str.Mid(4*i,3)));
-	   }
-       m_TcpIp.pBufIP_4->Add(NewElem);      
+		  m_TcpIp.pBufPORT->SetAt(i,0);
 	  }
-     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  }
 
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Конец загрузки~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  //////////////////////////////////////////////////////////////////////////////////////////
+	  while(m_FOtbor.ReadString(Str)) // считываем строки из файла
+	  {
+		Str.TrimLeft();    
+		Str.TrimRight();              // удаляем пробелы в начале и конце строки
+  
+		NewElem=(UINT)atoi(Str);
+		m_TcpIp.pBufPORT->SetAt(NewElem,(unsigned short) NewElem);      
+		if(Str=="//адрес") break;
+	  }
+
+	  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Конец загрузки~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	  //////////////////////////////////////////////////////////////////////////////////////////
 
   
-  // После того как массивы сформированы, необходимо их рассортировать в порядке возрастания
-  //~~~~~~~~~~~~~~~~~~~~~ (кроме pBufIP_2, так как он уже отсортирован) ~~~~~~~~~~~~~~~~~~~~
-  //               Это существенно облегчит поиск IP-адреса в массивах отбора 
+	  m_FOtbor.SeekToBegin();         // на  начало файла
 
-  int nSizeArrayIP_3,    // переменные для определения размерности массивов pBufIP_3 и pBufIP_4
-	   nSizeArrayIP_4;
+	  while(m_FOtbor.ReadString(Str))
+	  {
+		  if((FindFlag=Str.Find("адрес"))!=-1) break;  //находим строку "//адрес"
+	  }
 
-  nSizeArrayIP_3=m_TcpIp.pBufIP_3->GetSize();
-  nSizeArrayIP_4=m_TcpIp.pBufIP_4->GetSize();    // определяем размеры массивов
+	  if(FindFlag==-1) 
+	  {
+		  delete m_TcpIp.pBufIP_2;
+		  delete m_TcpIp.pBufIP_3;
+		  delete m_TcpIp.pBufIP_4;
+		  MessageBox("Hеправильный формат файла отбора - "+m_FileSel,NULL,MB_ICONERROR);
+		  return FALSE;
+	  }
 
-  //~~~~~~~~~~~~~~~~~~~~~~~сортируем массив pBufIP_3~~~~~~~~~~~~~~~~~~~~~~
-  if(nSizeArrayIP_3!=0) QuickSort(m_TcpIp.pBufIP_3,0,nSizeArrayIP_3-1);
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	  //////////////////////////////////////////////////////////////////////////////////////
+	  // ~~~~~~~~~~~~~~~~~~~~~Загружаем IP-адреса в соответствующие массивы~~~~~~~~~~~~~~~~~
 
-  //~~~~~~~~~~~~~~~~~~~~~~~сортируем массив pBufIP_4~~~~~~~~~~~~~~~~~~~~~~
-  if(nSizeArrayIP_4!=0) QuickSort(m_TcpIp.pBufIP_4,0,nSizeArrayIP_4-1);
-  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	  m_TcpIp.pBufIP_2->SetSize(65536);
+	  for(i=0;i<65536;i++)           // обнуляем массив для 2-х байтных адресов
+	  {
+		  m_TcpIp.pBufIP_2->SetAt(i,0);
+	  }
+
+	  while(m_FOtbor.ReadString(Str)) // считываем строки из файла
+	  {
+		Str.TrimLeft();    
+		Str.TrimRight();              // удаляем пробелы в начале и конце строки
+
+		// если длина строки соответствует 2-х байтному адресу
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		if(Str.GetLength()==7) 
+		{
+		  NewElem=0;
+		  if(Str.Find('.')!=3) return FALSE;
+		  for(i=0;i<2;i++)
+		  {
+			  NewElem=(NewElem<<8)|((UINT)atoi(Str.Mid(4*i,3)));
+		  }
+		  m_TcpIp.pBufIP_2->SetAt(NewElem,(unsigned short) NewElem);      
+		}
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+		// если длина строки соответствует 3-х байтному адресу
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		else
+		 if(Str.GetLength()==11) 
+		 {
+		  NewElem=0; 
+		  if(Str.Find('.')!=3) return FALSE;
+		  for(i=0;i<3;i++)
+		  {
+			  NewElem=(NewElem<<8)|((UINT)atoi(Str.Mid(4*i,3)));
+		  }
+		  m_TcpIp.pBufIP_3->Add(NewElem);      
+		 }
+		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+		 // если длина строки соответствует 4-х байтному адресу
+		 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		 else
+		  if(Str.GetLength()==15) 
+		  {
+		   NewElem=0; 
+		   if(Str.Find('.')!=3) return FALSE;
+		   for(i=0;i<4;i++)
+		   {
+			  NewElem=(NewElem<<8)|((UINT)atoi(Str.Mid(4*i,3)));
+		   }
+		   m_TcpIp.pBufIP_4->Add(NewElem);      
+		  }
+		 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	  }
+
+	  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Конец загрузки~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	  //////////////////////////////////////////////////////////////////////////////////////////
+
   
-  m_FOtbor.Close();
+	  // После того как массивы сформированы, необходимо их рассортировать в порядке возрастания
+	  //~~~~~~~~~~~~~~~~~~~~~ (кроме pBufIP_2, так как он уже отсортирован) ~~~~~~~~~~~~~~~~~~~~
+	  //               Это существенно облегчит поиск IP-адреса в массивах отбора 
 
-return TRUE;
+	  int nSizeArrayIP_3,    // переменные для определения размерности массивов pBufIP_3 и pBufIP_4
+		   nSizeArrayIP_4;
+
+	  nSizeArrayIP_3=m_TcpIp.pBufIP_3->GetSize();
+	  nSizeArrayIP_4=m_TcpIp.pBufIP_4->GetSize();    // определяем размеры массивов
+
+	  //~~~~~~~~~~~~~~~~~~~~~~~сортируем массив pBufIP_3~~~~~~~~~~~~~~~~~~~~~~
+	  if(nSizeArrayIP_3!=0) QuickSort(m_TcpIp.pBufIP_3,0,nSizeArrayIP_3-1);
+	  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	  //~~~~~~~~~~~~~~~~~~~~~~~сортируем массив pBufIP_4~~~~~~~~~~~~~~~~~~~~~~
+	  if(nSizeArrayIP_4!=0) QuickSort(m_TcpIp.pBufIP_4,0,nSizeArrayIP_4-1);
+	  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+	  m_FOtbor.Close();
+
+	return TRUE;
 }
 
 void CProtocolDlg::OnFileSel() 
@@ -819,7 +819,7 @@ void CProtocolDlg::OnFileSel()
 		m_FileSel="";
 		UpdateData(FALSE);
 	}
-	
+	return;
 }
 
    //~~~~~~~~~~~~~~~~~ МЕТОД БЫСТРОЙ СОРТИРОВКИ (QuickSort) ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -827,40 +827,40 @@ void CProtocolDlg::OnFileSel()
 
 void CProtocolDlg::QuickSort(CArray<UINT,UINT>*A,int iLo,int iHi) 
 {
-    int Lo,
-		 Hi;
+		int Lo,
+			 Hi;
 
-	UINT
-		 Mid,
-		 T;
+		UINT
+			 Mid,
+			 T;
 
-	div_t divResult;
+		div_t divResult;
 
-    Lo = iLo;
-    Hi = iHi;
-	divResult=div(Lo + Hi,2);
-    Mid = A->GetAt(divResult.quot); // элемент в середине массива
+		Lo = iLo;
+		Hi = iHi;
+		divResult=div(Lo + Hi,2);
+		Mid = A->GetAt(divResult.quot); // элемент в середине массива
 
-   do
-	{
-      while ((A->GetAt(Lo)) < Mid) Lo++;
-      while ((A->GetAt(Hi)) > Mid) Hi--;
-      if(Lo <= Hi)
-      {
+	   do
+		{
+		  while ((A->GetAt(Lo)) < Mid) Lo++;
+		  while ((A->GetAt(Hi)) > Mid) Hi--;
+		  if(Lo <= Hi)
+		  {
       
-        T = A->GetAt(Lo);
-		A->SetAt(Lo,A->GetAt(Hi));
-		A->SetAt(Hi,T);
-        Lo++;
-        Hi--;
-	  }   
-	}
-   while(Lo <= Hi);
+			T = A->GetAt(Lo);
+			A->SetAt(Lo,A->GetAt(Hi));
+			A->SetAt(Hi,T);
+			Lo++;
+			Hi--;
+		  }   
+		}
+	   while(Lo <= Hi);
 
-    if(Hi > iLo) QuickSort(A, iLo, Hi);
-    if(Lo < iHi) QuickSort(A, Lo, iHi);
+		if(Hi > iLo) QuickSort(A, iLo, Hi);
+		if(Lo < iHi) QuickSort(A, Lo, iHi);
 
-return;  
+	return;  
 }
 
 
@@ -915,14 +915,14 @@ void CProtocolDlg::OnClose()
 
 void CProtocolDlg::OnSaveCfg()		// сохранение конфигурациии
 {
-	// TODO: Add your command handler code here
-	CFileDialog dlgFile(FALSE,"cnf",NULL,OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
-		                "Файл конфигурации (*.cnf)|*.cnf|Все файлы(*.*)|*.*||",NULL) ;
-	if(dlgFile.DoModal()==IDOK)
-	{
-     SaveCfg(dlgFile.GetPathName());	  
-	}
-return;	
+		// TODO: Add your command handler code here
+		CFileDialog dlgFile(FALSE,"cnf",NULL,OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
+							"Файл конфигурации (*.cnf)|*.cnf|Все файлы(*.*)|*.*||",NULL) ;
+		if(dlgFile.DoModal()==IDOK)
+		{
+		 SaveCfg(dlgFile.GetPathName());	  
+		}
+	return;	
 }
 
 void CProtocolDlg::OnZagrCfg()			//открываем файл конфигурции
@@ -937,6 +937,7 @@ void CProtocolDlg::OnZagrCfg()			//открываем файл конфигурции
 	{
 		ZagrCfg(dlgFile.GetPathName());
 	}
+	return;
 }
 
 void CProtocolDlg::ZagrCfg(CString FileName)	// загружаем конфигурацию
@@ -1057,75 +1058,74 @@ void CProtocolDlg::ZagrCfg(CString FileName)	// загружаем конфигурацию
 			  sTemp.TrimRight();
               m_OtbDlg.m_NonSave=atoi(sTemp);
 			}
-
 		}
-
-  UpdateData(FALSE);
-  SetCurrentDirectory(CurDir);
-  f.Close();
- return;
+	  UpdateData(FALSE);
+	  SetCurrentDirectory(CurDir);
+	  f.Close();
+	return;
 }
 
 
 void CProtocolDlg::SaveCfg(CString FileName)		// сохраняем конфигурацию в файл
 {
+	 CFile f;
+	 CString sTemp,d;
 
- CFile f;
- CString sTemp,d;
+	 f.Open(FileName,CFile::modeCreate|CFile::modeWrite);
 
- f.Open(FileName,CFile::modeCreate|CFile::modeWrite);
+	  sTemp="TempDirName:"+m_TcpIp.strTempDir+"\r\n";
+	  f.Write(sTemp,sTemp.GetLength());
 
-  sTemp="TempDirName:"+m_TcpIp.strTempDir+"\r\n";
-  f.Write(sTemp,sTemp.GetLength());
+	  sTemp="SelectDirName:"+m_TcpIp.strSelDir+"\r\n";  
+	  f.Write(sTemp,sTemp.GetLength());
 
-  sTemp="SelectDirName:"+m_TcpIp.strSelDir+"\r\n";  
-  f.Write(sTemp,sTemp.GetLength());
+	  sTemp="UnselDirName:"+m_TcpIp.strNonSelDir+"\r\n";  
+	  f.Write(sTemp,sTemp.GetLength());
 
-  sTemp="UnselDirName:"+m_TcpIp.strNonSelDir+"\r\n";  
-  f.Write(sTemp,sTemp.GetLength());
+	  sTemp="SelectFile:"+m_FileSel+"\r\n";  
+	  f.Write(sTemp,sTemp.GetLength());
 
-  sTemp="SelectFile:"+m_FileSel+"\r\n";  
-  f.Write(sTemp,sTemp.GetLength());
+	  d.Format("%d",m_OtbDlg.m_RADIO);
+	  sTemp="Select:"+d+"\r\n";  
+	  f.Write(sTemp,sTemp.GetLength());
 
-  d.Format("%d",m_OtbDlg.m_RADIO);
-  sTemp="Select:"+d+"\r\n";  
-  f.Write(sTemp,sTemp.GetLength());
+	  d.Empty();
+	  if(m_CheckDelMin==TRUE)  d.Format("%d",m_SliderK.GetPos());
+	  sTemp="MinLen:"+d+"\r\n";  
+	  f.Write(sTemp,sTemp.GetLength());
 
-  d.Empty();
-  if(m_CheckDelMin==TRUE)  d.Format("%d",m_SliderK.GetPos());
-  sTemp="MinLen:"+d+"\r\n";  
-  f.Write(sTemp,sTemp.GetLength());
+	  d.Empty();
+	  if(m_CheckDelMax==TRUE) d.Format("%d",m_SliderD.GetPos());
+	  sTemp="MaxLen:"+d+"\r\n";  
+	  f.Write(sTemp,sTemp.GetLength());
 
-  d.Empty();
-  if(m_CheckDelMax==TRUE) d.Format("%d",m_SliderD.GetPos());
-  sTemp="MaxLen:"+d+"\r\n";  
-  f.Write(sTemp,sTemp.GetLength());
-
-  d.Format("%d",m_OtbDlg.m_NonSave);
-  sTemp="Flag_SaveNonSel:"+d+"\r\n";  
-  f.Write(sTemp,sTemp.GetLength()); 
-  f.Close();
+	  d.Format("%d",m_OtbDlg.m_NonSave);
+	  sTemp="Flag_SaveNonSel:"+d+"\r\n";  
+	  f.Write(sTemp,sTemp.GetLength()); 
+	  f.Close();
+	return;
 }
 
-void CProtocolDlg::CloseThread()
-{
- CTempDirDlg *m_TempDlg;
-  
- m_TempDlg=new CTempDirDlg;
- m_TempDlg->Create(IDD_TmpDir);
 
- m_TempDlg->m_Progress.SetRange(0,m_TcpIp.nCountData/50);
- 
- for(int i=0;i<m_TcpIp.nCountData;i++) 
- {
-   CloseHandle(m_TcpIp.nData.GetAt(i).h_File);
-   DeleteFile(m_TcpIp.nData.GetAt(i).dFile);
-   if(i%50==0) m_TempDlg->m_Progress.SetPos(i/50);
- }
- m_TempDlg->EndDialog(0);
- m_TempDlg->DestroyWindow();
- delete[] m_TempDlg;
-return;
+void CProtocolDlg::CloseThread()		// закрытие потока
+{
+	CTempDirDlg* m_TempDlg;
+
+	m_TempDlg = new CTempDirDlg;
+	m_TempDlg->Create(IDD_TmpDir);
+
+	m_TempDlg->m_Progress.SetRange(0, m_TcpIp.nCountData / 50);
+
+	for (int i = 0;i < m_TcpIp.nCountData;i++)
+	{
+		CloseHandle(m_TcpIp.nData.GetAt(i).h_File);
+		DeleteFile(m_TcpIp.nData.GetAt(i).dFile);
+		if (i % 50 == 0) m_TempDlg->m_Progress.SetPos(i / 50);
+	}
+	m_TempDlg->EndDialog(0);
+	m_TempDlg->DestroyWindow();
+	delete[] m_TempDlg;
+	return;
 }
 
 

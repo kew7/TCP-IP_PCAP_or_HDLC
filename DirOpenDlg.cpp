@@ -143,7 +143,8 @@ void CDirOpenDialog::OnItemexpandingTreeDir(NMHDR* pNMHDR, LRESULT* pResult)
 	int ImageIndex,DirPresentFlag=0;
 	struct _finddata_t FindStructure; FindStructure.attrib=_A_SUBDIR; 
 	struct _finddata_t FindStructure1; FindStructure1.attrib=_A_SUBDIR; 
-   if (pNMTreeView->action==TVE_EXPAND){
+
+	if (pNMTreeView->action==TVE_EXPAND){
 	   //~~~~~~~~~ Перегрузим иконку на раскрытую директорию ~~~~~~~~~~~~~~~~
 		pFolderTree->GetItemImage(pNMTreeView->itemNew.hItem,ImageIndex,ImageIndex);
 		if (ImageIndex==6)  pFolderTree->SetItemImage(pNMTreeView->itemNew.hItem,7,7);
@@ -189,9 +190,12 @@ void CDirOpenDialog::OnItemexpandingTreeDir(NMHDR* pNMHDR, LRESULT* pResult)
 				_findclose(lFindHandle1);
 				tvinsert.hParent=pNMTreeView->itemNew.hItem;
 			}
-		}while(_findnext(lFindHandle,&FindStructure) == 0);
+		}
+		while(_findnext(lFindHandle,&FindStructure) == 0);
+
 		_findclose(lFindHandle);//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	}
+
    if (pNMTreeView->action==TVE_COLLAPSE){
 	   //~~~~~~~~~ Перегрузим иконку на закрытую директорию ~~~~~~~~~~~~~~~~
 		pFolderTree->GetItemImage(pNMTreeView->itemNew.hItem,ImageIndex,ImageIndex);
@@ -220,8 +224,10 @@ void CDirOpenDialog::OnSelchangedTreeDir(NMHDR* pNMHDR, LRESULT* pResult)
 		m_TmpStr.MakeReverse();
 		m_FullPath+=m_TmpStr;
 		hItem=pFolderTree->GetParentItem(hItem);
-	}while(hItem!=NULL);
-	m_FullPath.MakeReverse();//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	}
+	while(hItem!=NULL);
+
+	m_FullPath.MakeReverse();
 	if (m_FullPath.GetLength()>3)m_FullPath=m_FullPath.Left(m_FullPath.ReverseFind('\\'));
 	Path=m_FullPath;
 	if(m_FullPath.GetLength()>32) m_FullPath=m_FullPath.Left(3)+"...."+m_FullPath.Right(25);
