@@ -29,7 +29,7 @@ CTCP_IP::~CTCP_IP()
 
 }
 
-UINT CTCP_IP::DePakets(BYTE *BufIN, UINT nCount)  // обработка протокола и выделение пакетов
+UINT CTCP_IP::DePakets(BYTE *BufIN, UINT nCount)  // обработка протоколов и выделение пакетов
 {
 	CString strTemp;
 	int i;
@@ -287,7 +287,7 @@ void CTCP_IP::FormatData(UINT ii)		// запись сеансов соответственно параметрам о
 	return;
 }
 
-void CTCP_IP::Zagolovok()  // вставляет заголовок в начало регистрируемого сеанса
+void CTCP_IP::Zagolovok()		// вставляет заголовок в начало регистрируемого сеанса
 {
 	CString strZagFR = "", strZagTO = "",
 		strZag,
@@ -406,6 +406,7 @@ BOOL CTCP_IP::Granica(UINT ii) // определяет размер регистрируемых сеансов
 return FALSE;
 }
 
+// запись в файл регистрируемых сеансов
 void CTCP_IP::WriteSeans(UINT& gFile, UINT& gDir, CString& gstrDir,CString strDir, UINT k)
 {
 	                     // gFile - nFilesInDir
