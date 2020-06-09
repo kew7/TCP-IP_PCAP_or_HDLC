@@ -176,7 +176,7 @@ BOOL CProtocolDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 	
 	// TODO: Add extra initialization here
-	GetMenu()->EnableMenuItem(ID_IN_FILE,MF_GRAYED);
+	GetMenu()->EnableMenuItem(ID_IN_FILE,MF_ENABLED);
 
 	SetDlgItemText(IDC_STATIC_KD,m_KData);
 	SetDlgItemText(IDC_STATIC_DD,m_DData);
@@ -352,34 +352,39 @@ bool CProtocolDlg::OnPlay()		// запуск обработки файла
 {
 	CString strTemp;
 
-		if(m_InFile!="")		// проверка имени файла
+		if(m_InFile!="")			// проверка имени файла
 		{
-			if (m_Radio == 0)	// если файл HDLC
+			if (m_Radio == 0)		// если файл HDLC
 			{
 				if (!m_FileInName.Open(m_InFile, CFile::modeRead | CFile::typeBinary))
 				{
 				 MessageBox("Такого файла не существует!!!",0,MB_ICONERROR);
 				 m_Rabota.SetCheck(0);
+				 return FALSE;
 				}
 				else
 				{				
-					BufLoadHDLC();
+					m_ColorSost = RGB(32, 128, 32);
+					SetDlgItemText(IDC_SOST, (LPCTSTR)"Обработка...");
+					BufLoadHDLC();	// обработка HDLC	
 				}
-    			return FALSE;
+  
 			}
-			else				// если файл CAP
+			else					// если файл CAP
 			{					
-				BufLoadCAP();
+				m_ColorSost = RGB(32, 128, 32);
+				SetDlgItemText(IDC_SOST, (LPCTSTR)"Обработка...");
+				BufLoadCAP();		// обработка CAP
 			}
-
-			m_ColorSost = RGB(32, 128, 32);
-			SetDlgItemText(IDC_SOST, (LPCTSTR)"Обработка...");
+			
+			// отображаем параметры после завершения обработки
+			m_ColorSost = RGB(128, 32, 32);
+			SetDlgItemText(IDC_SOST, (LPCTSTR)"Ожидание...");
 			strTemp.Format("%u",++calcFiles);
 			SetDlgItemText(IDC_STATIC_O,strTemp);
 			strTemp.Format("%u",m_TcpIp.nCountData);
 			SetDlgItemText(IDC_STATIC_C,strTemp);
 			m_Progress.SetPos(0);
-			return TRUE;	
 		}
 		else
 		{
@@ -406,11 +411,13 @@ void CProtocolDlg::BufLoadHDLC() // чтение и обработка файла HDLC
 void CProtocolDlg::BufLoadCAP()	// обработка файла CAP
 {	
 		/*
-		* Step 1 - Add includes
+		* Step 1 - Add Variables
 		*/
-		int returnValue;
+		int	 returnValue;
 		BYTE buf_save[5000]; // buffer for reading data from a file
-
+		u_int	packetCount = 0,
+				NumberOfPackets = 0; // number of packets in the file
+		CString StrTemp;
 		/*
 		* Step 2 - Get a file name
 		*/
@@ -429,8 +436,15 @@ void CProtocolDlg::BufLoadCAP()	// обработка файла CAP
 		*/
 		// Use pcap_open_offline
 		// http://www.winpcap.org/docs/docs_41b5/html/group__wpcapfunc.html#g91078168a13de8848df2b7b83d1f5b69
-		pcap_t* fpcap = pcap_open_offline(file.c_str(), errbuff);
-		
+		pcap_t* fpcap;
+		if ((fpcap = pcap_open_offline(file.c_str(), errbuff)) == NULL)
+		{
+			m_ListBox.AddString(errbuff);
+			m_ColorSost = RGB(128, 32, 32);
+			SetDlgItemText(IDC_SOST, (LPCTSTR)"ERROR!!!");
+			return;
+		}
+
 		/*
 		* Step 5 - Create a header and a data object
 		*/
@@ -439,19 +453,12 @@ void CProtocolDlg::BufLoadCAP()	// обработка файла CAP
 		struct pcap_pkthdr* header;
 		const BYTE* data;
 
-		/*
-		* Step 6 - Add Variables
-		*/
-		u_int packetCount = 0,
-			  NumberOfPackets=0; // number of packets in the file
-		CString StrTemp;
-
 		// Определяем число пакетов в файле
 		while ((returnValue = pcap_next_ex(fpcap, &header, &data)) >= 0)
 		{
 			NumberOfPackets++;
 		}
-		pcap_close(fpcap);
+		pcap_close(fpcap);		// Closing of the file
 
 		m_Progress.SetRange(0, NumberOfPackets/10);			// калибруем ползунок
 
