@@ -333,6 +333,7 @@ void CProtocolDlg::OnRabota()
 	{
 		m_ThreadFlag=FALSE;
 		m_TcpIp.strSelDir=m_TcpIp.strSelDir.Left(m_TcpIp.strSelDir.GetLength());
+		m_ListBox.DeleteString(0);
 		m_Rabota.SetCheck(0);
 	 return;
  }
@@ -365,7 +366,7 @@ bool CProtocolDlg::OnPlay()		// запуск обработки файла
 				else
 				{				
 					m_ColorSost = RGB(32, 128, 32);
-					SetDlgItemText(IDC_SOST, (LPCTSTR)"Обработка...");
+					SetDlgItemText(IDC_SOST, (LPCTSTR)"Processing...");
 					BufLoadHDLC();	// обработка HDLC	
 				}
   
@@ -373,13 +374,13 @@ bool CProtocolDlg::OnPlay()		// запуск обработки файла
 			else					// если файл CAP
 			{					
 				m_ColorSost = RGB(32, 128, 32);
-				SetDlgItemText(IDC_SOST, (LPCTSTR)"Обработка...");
+				SetDlgItemText(IDC_SOST, (LPCTSTR)"Processing...");
 				BufLoadCAP();		// обработка CAP
 			}
 			
 			// отображаем параметры после завершения обработки
 			m_ColorSost = RGB(128, 32, 32);
-			SetDlgItemText(IDC_SOST, (LPCTSTR)"Ожидание...");
+			SetDlgItemText(IDC_SOST, (LPCTSTR)"Waiting...");
 			strTemp.Format("%u",++calcFiles);
 			SetDlgItemText(IDC_STATIC_O,strTemp);
 			strTemp.Format("%u",m_TcpIp.nCountData);
@@ -397,8 +398,9 @@ bool CProtocolDlg::OnPlay()		// запуск обработки файла
 
 void CProtocolDlg::BufLoadHDLC() // чтение и обработка файла HDLC
 {
-	 UINT nCount;
-	 BYTE BufIN[16384]; 
+	UINT nCount;
+	BYTE BufIN[16384]; 
+
 	 m_Progress.SetRange(0,(int)(m_FileInName.GetLength()/1024));
 	 while(nCount=m_FileInName.Read(BufIN,sizeof(BufIN))) 
 	 {
@@ -498,10 +500,10 @@ void CProtocolDlg::FirstFlag(BYTE*BufIN,int lenb)	// фунция снятия протокола HDL
 {  
    int i,j;
    static BYTE
-	      NN,ed_5,sum_ed,
+	      NN,ed_5,sum_ed,		// bit-staffing
 	      flag=0,
 		  buf_save[5000];  
-   static UINT l;
+   static UINT l;				// number of octets in the packet
 
 	 if(firstFlag) i=0;
 	 if(!firstFlag)
