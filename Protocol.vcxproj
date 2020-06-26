@@ -14,6 +14,7 @@
     <ProjectGuid>{C8A9C999-5BFA-48B4-9D8E-4B49CCCC59AF}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Mongoose_HDLC_CAP</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
